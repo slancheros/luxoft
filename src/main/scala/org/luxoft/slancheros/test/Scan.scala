@@ -65,12 +65,13 @@ class Scan extends ScanInterface {
   /** Traverses the part of the `input` array starting at `from` and until
    * `until`, and computes the maximum value for each entry of the output array,
    * given the `startingValue`.
+   * Until -non-inclusive
    */
   def sequentialDownsweep(input: Array[Float], output: Array[Float],
                           startingValue: Float, from: Int, until: Int): Unit= {
-    var j = until
+    var j = until -1
     var max = startingValue
-    while (j > from) {
+    while (j >= from) {
       val value = input(j)
       if (value > max) max = value else ()
       output(j) = max
