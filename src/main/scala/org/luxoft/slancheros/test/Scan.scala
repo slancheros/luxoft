@@ -1,9 +1,6 @@
 package org.luxoft.slancheros.test
 
 import scala.util.DynamicVariable
-//import scala.concurrent.JavaConversions.{asExecutionContext,_}
-//import scala.concurrent.forkjoin.{ForkJoinPool, ForkJoinTask, ForkJoinWorkerThread,
- // RecursiveTask}
 import java.util.concurrent._
 
 abstract class Tree(val maxPrevious: Float)
@@ -43,8 +40,18 @@ class Scan extends ScanInterface {
    * from - inclusive
    * until - non-inclusive
    */
-  def sequentialUpsweep(input: Array[Float], from: Int, until: Int): Float = ???
-
+  def sequentialUpsweep(input: Array[Float], from: Int, until: Int): Float  = {
+    var output = 0f
+    var j = from
+    var max = 0f
+    while (j < until) {
+      val value = input(j)
+      if (value > max) max = value else ()
+      output = max
+      j += 1
+    }
+    output
+  }
   /** Traverses the part of the array starting at `from` and until `until`, and
    * returns the reduction tree for that part of the array.
    *
@@ -59,8 +66,17 @@ class Scan extends ScanInterface {
    * `until`, and computes the maximum value for each entry of the output array,
    * given the `startingValue`.
    */
-  def sequentialDownsweep(input: Array[Float], output: Array[Float], startingValue: Float, from: Int, until:
-  Int): Unit = ???
+  def sequentialDownsweep(input: Array[Float], output: Array[Float],
+                          startingValue: Float, from: Int, until: Int): Unit= {
+    var j = until
+    var max = startingValue
+    while (j > from) {
+      val value = input(j)
+      if (value > max) max = value else ()
+      output(j) = max
+      j -= 1
+    }
+  }
 
   /** Pushes the maximum value in the prefix of the array to each leaf of the
    * reduction `tree` in parallel, and then calls `downsweepSequential` to write
@@ -69,6 +85,7 @@ class Scan extends ScanInterface {
   def downsweep(input: Array[Float], output: Array[Float], startingValue: Float, tree: Tree): Unit = ???
 
   override def scan(input: Array[Float], output: Array[Float], threshold: Int): Unit = scan(input, output, threshold)
+
 
 
 val forkJoinPool = new java.util.concurrent.ForkJoinPool()
@@ -120,6 +137,8 @@ val forkJoinPool = new java.util.concurrent.ForkJoinPool()
       }
     }
   }
+
+
 }
 
 
