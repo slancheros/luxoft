@@ -1,5 +1,7 @@
 package org.luxoft.slancheros.test
 
+import org.luxoft.slancheros.test.Tree.{Leaf, Node}
+
 import scala.util.DynamicVariable
 import java.util.concurrent._
 
@@ -22,6 +24,7 @@ trait ScanInterface {
 }
 
 class Scan extends ScanInterface {
+
   def sequentialScan(input: Array[Float], output: Array[Float]): Unit = {
     //
     output(0) = 0
@@ -61,6 +64,15 @@ class Scan extends ScanInterface {
    * work is divided and done recursively in parallel.
    */
   def upsweep(input: Array[Float], from: Int, until: Int, threshold: Int): Tree = ???
+  /*{
+    if(until - from < threshold){
+      Leaf( from, until, input(from))
+    } else{
+      val mid = from + (until − from)/2
+      val (a,b) =  parallel ( upsweep(input, from, mid,threshold), upsweep(input, mid, until, threshold))
+      Node(a,b)
+    }
+  }*/
 
   /** Traverses the part of the `input` array starting at `from` and until
    * `until`, and computes the maximum value for each entry of the output array,
