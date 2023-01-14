@@ -1,5 +1,6 @@
 package org.luxoft.slancheros.test
 
+
 import org.luxoft.slancheros.test.Tree.{Leaf, Node}
 
 import scala.util.DynamicVariable
@@ -24,6 +25,11 @@ trait ScanInterface {
 }
 
 class Scan extends ScanInterface {
+
+  val scheduler: TaskScheduler = new TaskScheduler() {
+    override def schedule[T](body: => T): ForkJoinTask[T] = ???
+  }
+
 
   def sequentialScan(input: Array[Float], output: Array[Float]): Unit = {
     //
@@ -55,6 +61,9 @@ class Scan extends ScanInterface {
     }
     output
   }
+
+  def upsweep(input: Array[Float], from: Int, mid: Int): Tree = ???
+
   /** Traverses the part of the array starting at `from` and until `until`, and
    * returns the reduction tree for that part of the array.
    *
@@ -63,16 +72,16 @@ class Scan extends ScanInterface {
    * If the specified part of the array is longer than `threshold`, then the
    * work is divided and done recursively in parallel.
    */
-  def upsweep(input: Array[Float], from: Int, until: Int, threshold: Int): Tree = ???
-  /*{
-    if(until - from < threshold){
-      Leaf( from, until, input(from))
-    } else{
-      val mid = from + (until − from)/2
-      val (a,b) =  parallel ( upsweep(input, from, mid,threshold), upsweep(input, mid, until, threshold))
-      Node(a,b)
+  def upsweep(input: Array[Float], from: Int, until: Int, threshold: Int): Tree = {
+    if(until - from < threshold)
+    {
+      Leaf(from, until, input(from))
+    }else {
+      val mid = (from + (until - from)) / 2
+     //Node(defaultTaskScheduler.parallel(  upsweep(input, from,mid),upsweep(input, mid, until)))
+      Leaf(from, until, input(from))
     }
-  }*/
+  }
 
   /** Traverses the part of the `input` array starting at `from` and until
    * `until`, and computes the maximum value for each entry of the output array,
@@ -101,55 +110,6 @@ class Scan extends ScanInterface {
 
 
 
-val forkJoinPool = new java.util.concurrent.ForkJoinPool()
-
-  abstract class TaskScheduler {
-
-    def schedule[T](body: => T): ForkJoinTask[T]
-    def task[T](body: => T):
-    ForkJoinTask[T] = this.schedule(body)
-
-    def parallel[A, B](taskA: => A, taskB: => B):(A,B) ={
-      val right = task {
-        taskB
-      }
-      val left = taskA
-      (left, right.join())
-    }
-
-
-    class DefaultTaskScheduler extends TaskScheduler {
-      val scheduler = new DynamicVariable[TaskScheduler](new DefaultTaskScheduler())
-      def schedule[T](body: => T): ForkJoinTask[T] = {
-        val t = new RecursiveTask[T] {
-          def compute = body
-        }
-
-        Thread.currentThread match {
-          case wt: ForkJoinWorkerThread => t.fork()
-          case _ => forkJoinPool.execute(t)
-        }
-        t
-      }
-
-
-      override def parallel[A, B](taskA: => A, taskB: => B):(A,B) =  scheduler.value.parallel(taskA,taskB)
-
-      def parallel[A, B, C, D](taskA: => A, taskB: => B, taskC: => C, taskD: => D): (A, B, C, D) = {
-        val ta = task {
-          taskA
-        }
-        val tb = task {
-          taskB
-        }
-        val tc = task {
-          taskC
-        }
-        val td = taskD
-        (ta.join(), tb.join(), tc.join(), td)
-      }
-    }
-  }
 
 
 }

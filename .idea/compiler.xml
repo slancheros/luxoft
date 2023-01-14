@@ -9,6 +9,8 @@
         <module name="luxoft" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="11" />
+    <bytecodeTargetLevel>
+      <module name="luxoft_5120" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>
