@@ -3,6 +3,7 @@ package org.luxoft.slancheros.test
 import org.junit._
 import org.scalameter._
 import Assert._
+import org.luxoft.slancheros.test.Tree.{Leaf, Node}
 
 
 @Test
@@ -59,4 +60,20 @@ class ScanTest {
 
 
 
+
+  @Test
+  def testPar2elements() = {
+    val input: Array[Float] = Array(1.5f, 2.3f)
+    val output = scan.upsweep(input, 0, 2, 1)
+    assert(true)
+  }
+
+  @Test
+  def testParDownsweepTree = {
+    val input: Array[Float] = Array(8.5f, 6.3f,0.8f, 4.6f)
+    val tree : Tree = scan.upsweep(input, 0, 4, 1)
+    val output: Array[Float] = Array()
+    scan.downsweep(input, output,startingValue = 6f,tree)
+    assertTrue(output.sameElements(Array(8.5f,6.3f,6f,6f)))
+  }
 }

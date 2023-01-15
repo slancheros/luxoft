@@ -3,12 +3,14 @@ package org.luxoft.slancheros.test
 
 import org.luxoft.slancheros.test.Tree.{Leaf, Node}
 
-import scala.util.DynamicVariable
-import java.util.concurrent._
+
 
 abstract class Tree(val maxPrevious: Float)
 
 object Tree{
+
+
+
   case class Node(left: Tree, right: Tree) extends Tree(left.maxPrevious.max(right.maxPrevious))
   case class Leaf(from: Int, until: Int, override val maxPrevious: Float) extends Tree(maxPrevious)
   }
@@ -21,14 +23,10 @@ trait ScanInterface {
   def sequentialDownsweep(input: Array[Float], output: Array[Float], startingValue: Float, from: Int, until:
   Int): Unit
   def downsweep(input: Array[Float], output: Array[Float], startingValue: Float, tree: Tree): Unit
-  def scan(input: Array[Float], output: Array[Float], threshold: Int): Unit
+ // def scan(input: Array[Float], output: Array[Float], threshold: Int): Unit
 }
 
 class Scan extends ScanInterface {
-
-  val scheduler: TaskScheduler = new TaskScheduler() {
-    override def schedule[T](body: => T): ForkJoinTask[T] = ???
-  }
 
 
   def sequentialScan(input: Array[Float], output: Array[Float]): Unit = {
@@ -49,7 +47,7 @@ class Scan extends ScanInterface {
    * from - inclusive
    * until - non-inclusive
    */
-  def sequentialUpsweep(input: Array[Float], from: Int, until: Int): Float  = {
+  def sequentialUpsweep(input: Array[Float], from: Int, until: Int): Float = {
     var output = 0f
     var j = from
     var max = 0f
@@ -62,7 +60,6 @@ class Scan extends ScanInterface {
     output
   }
 
-  def upsweep(input: Array[Float], from: Int, mid: Int): Tree = ???
 
   /** Traverses the part of the array starting at `from` and until `until`, and
    * returns the reduction tree for that part of the array.
@@ -72,14 +69,14 @@ class Scan extends ScanInterface {
    * If the specified part of the array is longer than `threshold`, then the
    * work is divided and done recursively in parallel.
    */
+
   def upsweep(input: Array[Float], from: Int, until: Int, threshold: Int): Tree = {
-    if(until - from < threshold)
-    {
-      Leaf(from, until, input(from))
-    }else {
+    if ((until - from) < threshold) {
+      Leaf(from, until, sequentialUpsweep(input, from, until))
+    } else {
       val mid = (from + (until - from)) / 2
-     //Node(defaultTaskScheduler.parallel(  upsweep(input, from,mid),upsweep(input, mid, until)))
-      Leaf(from, until, input(from))
+      val (a, b) = parallel(upsweep(input, from, mid, threshold),  upsweep(input, mid, until, threshold))
+      Node(a, b)
     }
   }
 
@@ -89,8 +86,8 @@ class Scan extends ScanInterface {
    * Until -non-inclusive
    */
   def sequentialDownsweep(input: Array[Float], output: Array[Float],
-                          startingValue: Float, from: Int, until: Int): Unit= {
-    var j = until -1
+                          startingValue: Float, from: Int, until: Int): Unit = {
+    var j = until - 1
     var max = startingValue
     while (j >= from) {
       val value = input(j)
@@ -100,16 +97,23 @@ class Scan extends ScanInterface {
     }
   }
 
+
   /** Pushes the maximum value in the prefix of the array to each leaf of the
    * reduction `tree` in parallel, and then calls `downsweepSequential` to write
    * the `output` values.
    */
-  def downsweep(input: Array[Float], output: Array[Float], startingValue: Float, tree: Tree): Unit = ???
+  def downsweep(input: Array[Float], output: Array[Float], startingValue: Float, tree: Tree): Unit = {
+    tree match {
+      case Leaf(from, until, _) => sequentialDownsweep(input, output, startingValue, from, until)
+      case Node(left, right) => {
+        parallel(
+          downsweep(input, output, startingValue, left),
+          downsweep(input, output, left.maxPrevious max startingValue,right))
+      }
+    }
+  }
 
-  override def scan(input: Array[Float], output: Array[Float], threshold: Int): Unit = scan(input, output, threshold)
-
-
-
+  //override def scan(input: Array[Float], output: Array[Float], threshold: Int): Unit = scan(input, output, threshold)
 
 
 }
