@@ -5,7 +5,7 @@ import java.util.concurrent._
 import scala.util.DynamicVariable
 
 package object test {
-  val forkJoinPool = new ForkJoinPool(8)
+  val forkJoinPool = new ForkJoinPool(2)
 
   abstract class TaskScheduler {
     def schedule[T](body: => T): ForkJoinTask[T]
