@@ -1,3 +1,5 @@
 # Table of contents
 
-* [Page 1](README.md)
+* [🌳 Partial parallel reduction tree](README.md)
+* [🚆 Efficiency comparison with sequential processing](efficiency-comparison-with-sequential-processing.md)
+* [👑 Solution](solution.md)
