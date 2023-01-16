@@ -1,5 +1,5 @@
 ---
-description: This is an explanation of the algorithm for the implementation requested.
+Link to the GitBook https://sandras-organization-1.gitbook.io/luxoft-test-parallel-reduction-tree-for-max-func/
 ---
 
 # 🌳 Partial parallel reduction tree
