@@ -1,8 +1,9 @@
----
-Link to the GitBook https://sandras-organization-1.gitbook.io/luxoft-test-parallel-reduction-tree-for-max-func/
----
+
+
 
 # 🌳 Partial parallel reduction tree
+
+Link to the GitBook https://sandras-organization-1.gitbook.io/luxoft-test-parallel-reduction-tree-for-max-func/
 
 This is a widely used parallel computation pattern. Parallel reduction tree is the tree generated for processing a set of values using a function to provide a result for the set.
 
